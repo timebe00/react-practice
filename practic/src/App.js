@@ -4,7 +4,10 @@ import './App.css';
 function Header(props) {
   return (
     <header>
-      <h1><a href="/">{props.title}</a></h1>
+      <h1><a href="/" onClick={(e) =>{
+        e.preventDefault();
+        props.onChangeMode()
+      }} >{props.title}</a></h1>
     </header>
   )
 }
@@ -13,8 +16,17 @@ function Nav(props) {
   let lis = [];
   let topics = props.topics;
 
-  topics.map((element)=> {
-    lis.push(<li key={element.id}> <a href={"/read/" +element.id}>{element.title}</a> </li>)
+  topics.map((element)=>{
+    lis.push(
+    <li key={element.id}>
+      <a id={element.id} href={"/read/" +element.id} onClick={(e) => {
+        e.preventDefault();
+        //  해당 테그 내 id값 가져온다.
+        props.onChangeMode(e.target.id)
+      }} >
+        {element.title}
+      </a>
+    </li>)
   })
 
   return (
@@ -43,8 +55,12 @@ function App() {
   ]
   return (
     <div>
-      <Header title="React" ></Header>
-      <Nav topics={topics} ></Nav>
+      <Header title="React" onChangeMode={() => {
+        alert('Header');
+      }} ></Header>
+      <Nav topics={topics} onChangeMode={(id) => {
+        alert(id)
+      }} ></Nav>
       <Acticel title="Welcome" body="Hellow, Web" ></Acticel>
     </div>
   );
