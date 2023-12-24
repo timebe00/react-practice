@@ -48,16 +48,35 @@ function Acticel(props) {
   )
 }
 
+function Create(props) {
+  return (
+    <article>
+      <h2>Create</h2>
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        let title = e.target.title.value;
+        let body = e.target.body.value;
+        props.onCreate(title, body);
+      }} >
+        <p><input type='text' name="title" placeholder='title' /></p>
+        <p><textarea name="body" placeholder='body' ></textarea></p>
+        <p><input type='submit' value="create" /></p>
+      </form>
+    </article>
+  )
+}
+
 function App() {
   //  스테이터스 생성 mode :스테이서트 값, setMode : mode 값 세팅
   let [mode, setMode] = useState("WELCOME");
   let [id, setId] = useState(null);
+  let [nextId, setNextId] = useState(4)
 
-  let topics = [
+  let [topics, setTopics] = useState([
     {id : 1, title : "html", body : "html is ..."},
     {id : 2, title : "css", body : "css is ..."},
     {id : 3, title : "js", body : "js is ..."}
-  ]
+  ])
 
   let content;
   if(mode === "WELCOME") {
@@ -68,10 +87,24 @@ function App() {
     topics.map(element => {
       if(element.id === id) {
         title = element.title;
-        body = element.body
+        body = element.body;
       }
     })
+
     content = <Acticel title={title} body={body} ></Acticel>
+  } else if(mode === "CREATE") {
+      content = <Create onCreate={(_title, _body) => {
+      // 객체 변경
+      let newTopic = {id: nextId , title:_title, body : _body};
+      let newTopics = [...topics];
+      newTopics.push(newTopic);
+
+      // 페이지 변경
+      setTopics(newTopics);
+      setMode("READ");
+      setId(nextId++);
+      setNextId(nextId);
+    }} ></Create>
   }
 
   return (
@@ -84,6 +117,11 @@ function App() {
         setId(_id)
       }} ></Nav>
       {content}
+
+      <p><a href='/create' onClick={(e) =>{
+        e.preventDefault();
+        setMode("CREATE");
+      }} >Create</a></p>
     </div>
   );
 }
