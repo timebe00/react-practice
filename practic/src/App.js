@@ -41,10 +41,10 @@ function Nav(props) {
 
 function Acticel(props) {
   return(
-    <acticle>
+    <>
       <h2>{props.title}</h2>
       {props.body}
-    </acticle>
+</>
   )
 }
 
@@ -56,7 +56,7 @@ function Create(props) {
         e.preventDefault();
         let title = e.target.title.value;
         let body = e.target.body.value;
-        props.onUpdate(title, body);
+        props.onCreate(title, body);
       }} >
         <p><input type='text' name="title" placeholder='title' /></p>
         <p><textarea name="body" placeholder='body' ></textarea></p>
@@ -98,14 +98,15 @@ function App() {
   let [mode, setMode] = useState("WELCOME");
   let [id, setId] = useState(null);
   let [nextId, setNextId] = useState(4)
-
-  let contextControl;
-  let content;
   let [topics, setTopics] = useState([
     {id : 1, title : "html", body : "html is ..."},
     {id : 2, title : "css", body : "css is ..."},
     {id : 3, title : "js", body : "js is ..."}
-  ])
+  ]);
+
+  let contextControl;
+  let content;
+  
 
   if(mode === "WELCOME") {
     content = <Acticel title="Welcome" body="Hellow, Web" ></Acticel>
@@ -120,19 +121,35 @@ function App() {
     })
 
     content = <Acticel title={title} body={body} ></Acticel>
-    contextControl = <li><a href={"/update/" + id} onClick={(e) =>{
+    contextControl = <>
+    <li><a href={"/update/" + id} onClick={(e) =>{
       e.preventDefault();
       setMode('UPDATE')
     }} >Update</a></li>
+    <li><input type='button' value="Delete" onClick={async () => {
+      let newTopics = [];
+
+      for(let topicIdx in topics) {
+        let topic = topics[topicIdx];
+        if(topics[topicIdx].id !== id) {
+          newTopics.push(topic);
+        }
+      }
+      
+      console.log(newTopics)
+      await setTopics[newTopics];
+      setMode("WELCOME");
+    }} /></li>
+    </>
   } else if(mode === "CREATE") {
-      content = <Create onCreate={(_title, _body) => {
+      content = <Create onCreate={async (_title, _body) => {
       // 객체 변경
       let newTopic = {id: nextId , title:_title, body : _body};
       let newTopics = [...topics];
       newTopics.push(newTopic);
 
       // 페이지 변경
-      setTopics(newTopics);
+      await setTopics(newTopics);
       setMode("READ");
       setId(nextId++);
       setNextId(nextId);
@@ -147,7 +164,7 @@ function App() {
       }
     })
 
-    content = <Update title={title} body={body} onUpdate={(_title, _body) => {
+    content = <Update title={title} body={body} onUpdate={async (_title, _body) => {
       let updateTopic = {id : id, title : _title, body : _body};
       let newTopics = [...topics];
       
@@ -159,7 +176,7 @@ function App() {
         }
       }
 
-      setTopics(newTopics);
+      await setTopics(newTopics);
       setMode("READ");
     }}></Update>
   }
