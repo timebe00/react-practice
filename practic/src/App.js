@@ -1,97 +1,9 @@
 import './App.css';
 import { useState } from 'react';
 
-//  컴포넌트 생성
-function Header(props) {
-  return (
-    <header>
-      <h1><a href="/" onClick={(e) =>{
-        e.preventDefault();
-        props.onChangeMode()
-      }} >{props.title}</a></h1>
-    </header>
-  )
-}
-
-function Nav(props) {
-  let lis = [];
-  let topics = props.topics;
-
-  topics.map((element)=>{
-    lis.push(
-    <li key={element.id}>
-      <a id={element.id} href={"/read/" +element.id} onClick={(e) => {
-        e.preventDefault();
-        //  해당 테그 내 id값 가져온다.
-        props.onChangeMode(Number(e.target.id))
-      }} >
-        {element.title}
-      </a>
-    </li>)
-  })
-
-  return (
-    <nav>
-      <ol>
-        {lis}
-      </ol>
-    </nav>
-  )
-}
-
-function Acticel(props) {
-  return(
-    <>
-      <h2>{props.title}</h2>
-      {props.body}
-</>
-  )
-}
-
-function Create(props) {
-  return (
-    <article>
-      <h2>Create</h2>
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        let title = e.target.title.value;
-        let body = e.target.body.value;
-        props.onCreate(title, body);
-      }} >
-        <p><input type='text' name="title" placeholder='title' /></p>
-        <p><textarea name="body" placeholder='body' ></textarea></p>
-        <p><input type='submit' value="create" /></p>
-      </form>
-    </article>
-  )
-}
-
-//  props = "외부자가 내부자에게 주는 값"
-//  state = "내부자가 사용하는 값"
-function Update(props) {
-  let [title, setTitle] = useState(props.title);
-  let [body, setBody] = useState(props.body);
-
-  return (
-    <article>
-      <h2>Update</h2>
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        let title = e.target.title.value;
-        let body = e.target.body.value;
-        props.onUpdate(title, body);
-      }} >
-        <p><input type='text' name="title" placeholder='title' value={title} onChange={(e) => {
-          setTitle(e.target.value);
-        }} /></p>
-        <p><textarea name="body" placeholder='body' value={body} onChange={(e) => {
-          setBody(e.target.value)
-        }} ></textarea></p>
-        <p><input type='submit' value="updtae" /></p>
-      </form>
-    </article>
-  )
-}
+import { Header, Nav, Acticel } from './component/layout/layout.js';
+import { Create } from './component/create/create.js';
+import { Update } from './component/update/update.js';
 
 function App() {
   //  스테이터스 생성 mode :스테이서트 값, setMode : mode 값 세팅
@@ -106,7 +18,6 @@ function App() {
 
   let contextControl;
   let content;
-  
 
   if(mode === "WELCOME") {
     content = <Acticel title="Welcome" body="Hellow, Web" ></Acticel>
@@ -122,24 +33,23 @@ function App() {
 
     content = <Acticel title={title} body={body} ></Acticel>
     contextControl = <>
-    <li><a href={"/update/" + id} onClick={(e) =>{
-      e.preventDefault();
-      setMode('UPDATE')
-    }} >Update</a></li>
-    <li><input type='button' value="Delete" onClick={async () => {
-      let newTopics = [];
+      <li><a href={"/update/" + id} onClick={(e) =>{
+        e.preventDefault();
+        setMode('UPDATE')
+      }} >Update</a></li>
+      <li><input type='button' value="Delete" onClick={async () => {
+        let newTopics = [];
 
-      for(let topicIdx in topics) {
-        let topic = topics[topicIdx];
-        if(topics[topicIdx].id !== id) {
-          newTopics.push(topic);
+        for(let topicIdx in topics) {
+          let topic = topics[topicIdx];
+          if(topics[topicIdx].id !== id) {
+            newTopics.push(topic);
+          }
         }
-      }
-      
-      console.log(newTopics)
-      await setTopics[newTopics];
-      setMode("WELCOME");
-    }} /></li>
+        
+        setTopics(newTopics);
+        setMode("WELCOME");
+      }} /></li>
     </>
   } else if(mode === "CREATE") {
       content = <Create onCreate={async (_title, _body) => {
@@ -176,7 +86,7 @@ function App() {
         }
       }
 
-      await setTopics(newTopics);
+      setTopics(newTopics);
       setMode("READ");
     }}></Update>
   }
